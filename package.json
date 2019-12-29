@@ -1,0 +1,32 @@
+{
+  "name": "twocard-server",
+  "version": "0.0.1",
+  "description": "Backend for TwoCard",
+  "main": "index.js",
+  "scripts": {
+    "start": "node twocard.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SemteulGaram/TwoCard-Server.git"
+  },
+  "keywords": [
+    "twocard",
+    "card",
+    "game"
+  ],
+  "author": "SemteulGaram",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/SemteulGaram/TwoCard-Server/issues"
+  },
+  "homepage": "https://github.com/SemteulGaram/TwoCard-Server#readme",
+  "dependencies": {
+    "cross-env": "^6.0.3",
+    "koa": "^2.11.0",
+    "koa-logger": "^3.2.1",
+    "koa-static": "^5.0.0",
+    "socket.io": "^2.3.0",
+    "socket.io-client": "^2.3.0"
+  }
+}
