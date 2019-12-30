@@ -1,6 +1,8 @@
 const EventEmitter = require('events')
 const fs = require('fs')
 const path = require('path')
+const http = require('http')
+const https = require('https')
 
 const Koa = require('koa')
 const KoaLogger = require('koa-logger')
@@ -14,15 +16,16 @@ const log = Logger.createLogger('Server')
 
 class Server extends EventEmitter {
   constructor (ctx, options = {}) {
-    log.v('Server constructor enter')
+    log.v('constructor enter')
     this.ctx = ctx
 
     // options
-    this.options = options
-    this.options.httpPort = 3000
-    this.options.httpEnable = true
-    this.options.httpsPort = 3001
-    this.options.httpsEnable = false
+    this.options = Object.assign({
+      httpPort: 3000,
+      httpEnable: true,
+      httpsPort: 3001,
+      httpsEnable: false
+    }, options)
 
     // initialize
     this.http = { run: false, server: null }
@@ -37,23 +40,58 @@ class Server extends EventEmitter {
     // socket.io initialize
     this.socketIo = new SocketIo()
 
-    log.v('Server constructor leave')
+    log.v('constructor leave')
   }
 
-  async startServer () {
-    log.v('startServer enter')
-    log.i('Server starintg...')
-    this.emit('serverStarting')
+  async start () {
+    log.v('start enter')
+    log.i('Server starting...')
+    this.emit('starting')
 
-    // TODO: copy static file
-    //fsp.copyFile('./node_modules/socket.io-client/dist/socket.io.dev.js')
+    //await fsp.copyFile('./node_modules/socket.io-client/dist/socket.io.dev.js')
 
+    log.v('start leave')
     const that = this
-    return new Promise((resolve, reject) => {
+    return new Promise(async (resolve, reject) => {
+      const promiseList = []
 
-      // TODO: start file
-      this.emit('serverStart')
+      if (this.options.httpEnable) {
+        promiseList.push(new Promise((resolve, reject) => {
+          this.http.server = http.createServer(this._httpCallback())
+          this.http.server.on('listening', () => {
+            log.i(`http server start on port ${ this.options.httpPort }`)
+            resolve()
+          })
+          this.http.server.on('error', err => { reject(err) })
+          this.http.server.listen(this.options.httpPort)
+          this.socketIo.attach(this.http.server)
+          this.http.run = true
+        }))
+      }
+
+      if (this.options.httpsEnables) {
+        promiseList.push(new Promise(async (resolve, reject) => {
+          this.https.server = https.createServer({
+            cert: await fsp.readFile(this.options.httpsChain),
+            key: await fsp.readFile(this.options.httpsPrivateKey)
+          }, this._httpCallback())
+          this.https.server.on('listening', () => {
+            log.i(`https server start on port ${ this.options.httpsPort }`)
+            resolve()
+          })
+          this.https.server.on('error', err => { reject(err) })
+          this.https.server.listen(this.options.httpsPort)
+          this.socketIo.attach(this.https.server)
+          this.https.run = true
+        }))
+      }
+
+      await Pormise.all(promiseList)
+      this.emit('started')
     })
-    log.v('startServer leave')
+  }
+
+  _httpCallback () {
+    return this.koa.callback()
   }
 }
