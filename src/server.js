@@ -17,6 +17,7 @@ const log = Logger.createLogger('Server')
 class Server extends EventEmitter {
   constructor (ctx, options = {}) {
     log.v('constructor enter')
+    super()
     this.ctx = ctx
 
     // options
@@ -33,9 +34,12 @@ class Server extends EventEmitter {
 
     // Koa initialize
     this.koa = new Koa()
-    that.koa.on('error', err => {
+    this.koa.on('error', err => {
       log.e('Koa Error Occur:', err)
     })
+
+    this.koa.use(KoaLogger())
+    this.koa.use(KoaStatic(path.resolve(__dirname, '../client/')))
 
     // socket.io initialize
     this.socketIo = new SocketIo()
@@ -72,7 +76,7 @@ class Server extends EventEmitter {
       if (this.options.httpsEnables) {
         promiseList.push(new Promise(async (resolve, reject) => {
           this.https.server = https.createServer({
-            cert: await fsp.readFile(this.options.httpsChain),
+            cert: await fsp.readFile(this.options.httpsCert),
             key: await fsp.readFile(this.options.httpsPrivateKey)
           }, this._httpCallback())
           this.https.server.on('listening', () => {
@@ -86,7 +90,7 @@ class Server extends EventEmitter {
         }))
       }
 
-      await Pormise.all(promiseList)
+      await Promise.all(promiseList)
       this.emit('started')
     })
   }
@@ -95,3 +99,5 @@ class Server extends EventEmitter {
     return this.koa.callback()
   }
 }
+
+module.exports = Server

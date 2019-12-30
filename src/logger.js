@@ -4,6 +4,10 @@ const chalk = require('chalk')
 class GlobalLogger {
   constructor () {
     this.consoleLogLevel = 1
+
+    this.Level = this.constructor.Level
+    this.ReverseLevel = this.constructor.ReverseLevel
+    this.LevelColor = this.constructor.LevelColor
   }
 
   setConsoleLogLevel (type) {
@@ -56,7 +60,7 @@ GlobalLogger.LevelColor = [
   'gray',
   'gray',
   'white',
-  'yallow',
+  'yellow',
   'red'
 ]
 

@@ -1,0 +1,8 @@
+{
+  "httpEnable": true,
+  "httpPort": 7150,
+  "httpsEnable": false,
+  "httpsPort": 7151,
+  "httpsCert": "[cert path]",
+  "httpsPrivateKey": "[private key path]"
+}
