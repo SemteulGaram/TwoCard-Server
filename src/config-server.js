@@ -10,4 +10,5 @@ module.exports = new Config('server-setting',
     httpsPort: 7151,
     httpsCert: '[cert path]',
     httpsPrivateKey: '[private key path]'
-  })
+  }
+)

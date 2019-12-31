@@ -43,6 +43,7 @@ class Server extends EventEmitter {
 
     // socket.io initialize
     this.socketIo = new SocketIo()
+    this._socketIoHandle()
 
     log.v('constructor leave')
   }
@@ -97,6 +98,12 @@ class Server extends EventEmitter {
 
   _httpCallback () {
     return this.koa.callback()
+  }
+
+  _socketIoHandle () {
+    this.socketIo.on('connection', socket => {
+      console.log('connection')
+    })
   }
 }
 
